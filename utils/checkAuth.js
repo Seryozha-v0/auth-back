@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { keyJW } from '../config';
 
 export default (req, res, next) => {
     // const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
@@ -6,7 +7,7 @@ export default (req, res, next) => {
 
     if (token) {
         try {
-            const decoded = jwt.verify(token, 'secretKey47839');
+            const decoded = jwt.verify(token, keyJW);
 
             req.userId = decoded._id;
             next();

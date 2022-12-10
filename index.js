@@ -28,12 +28,12 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: procces.env.REACT_APP_URL && 'http://localhost:3000',
     credentials: true
 }));
 
 
-const cookieKey = 'secret123';
+const cookieKey = 'gfryw439829wjdaskdjfhbr321';
 app.use(cookieParser(cookieKey));
 
 app.use('/uploads', express.static('uploads'));
@@ -60,7 +60,7 @@ app.post('/auth/login', loginValidation, handleValidationErrors, userController.
 app.get('/auth/me', checkAuth, userController.getMe);
 app.get('/auth/logout', userController.logOut);
 
-app.listen(4400, (err) => {
+app.listen(procces.env.port || 4400, (err) => {
     if (err) {
         return console.log(err);
     }

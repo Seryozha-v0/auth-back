@@ -1,11 +1,13 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { keyJW } from '../config.js';
 
 //validation
 import { validationResult } from 'express-validator';
 
 //Models import
 import UserModel from '../models/User.js';
+
 
 
 export const register =  async (req, res) => {
@@ -38,7 +40,7 @@ export const register =  async (req, res) => {
         const token = jwt.sign({
             _id: user._id,
         }, 
-        'secretKey47839',
+        keyJW,
         {
             expiresIn: '14d',
         });
@@ -82,7 +84,7 @@ export const login = async (req, res) => {
         const token = jwt.sign({
             _id: user._id,
         }, 
-        'secretKey47839',
+        keyJW,
         {
             expiresIn: '14d',
         });
