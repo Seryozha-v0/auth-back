@@ -32,6 +32,10 @@ app.use(cors({
     credentials: true
 }));
 
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.sendFile('index.html', { root: path.join(__dirname, 'public') });
+})
 
 const cookieKey = 'gfryw439829wjdaskdjfhbr321';
 app.use(cookieParser(cookieKey));
@@ -68,3 +72,4 @@ app.listen(process.env.PORT || 4400, (err) => {
     console.log('Server is OK');
 });
 
+export default app;
