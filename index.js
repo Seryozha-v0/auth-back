@@ -28,7 +28,7 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: procces.env.REACT_APP_URL && 'http://localhost:3000',
+    origin: 'http://localhost:3000',
     credentials: true
 }));
 
@@ -60,7 +60,7 @@ app.post('/auth/login', loginValidation, handleValidationErrors, userController.
 app.get('/auth/me', checkAuth, userController.getMe);
 app.get('/auth/logout', userController.logOut);
 
-app.listen(procces.env.port || 4400, (err) => {
+app.listen(4400, (err) => {
     if (err) {
         return console.log(err);
     }
