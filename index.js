@@ -29,7 +29,8 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: (process.env.REACT_APP_URL || 'http://localhost:3000'),
+    // origin: (process.env.REACT_APP_URL || 'http://localhost:3000'),
+    origin: ('https://auth-front-eta.vercel.app'),
     credentials: true
 }));
 
