@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import path from 'path';
 
 
 import { registerValidation, loginValidation } from './validations/auth.js';
@@ -33,11 +32,6 @@ app.use(cors({
     origin: (process.env.REACT_APP_URL || 'http://localhost:3000'),
     credentials: true
 }));
-
-app.use(express.static('public'));
-app.get('/', (req, res) => {
-    res.sendFile('index.html', { root: path.join(__dirname, 'public') });
-})
 
 const cookieKey = 'gfryw439829wjdaskdjfhbr321';
 app.use(cookieParser(cookieKey));
