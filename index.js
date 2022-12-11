@@ -60,7 +60,7 @@ app.post('/auth/login', loginValidation, handleValidationErrors, userController.
 app.get('/auth/me', checkAuth, userController.getMe);
 app.get('/auth/logout', userController.logOut);
 
-app.listen(4400, (err) => {
+app.listen(process.env.PORT || 4400, (err) => {
     if (err) {
         return console.log(err);
     }
