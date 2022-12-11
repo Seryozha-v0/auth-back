@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+
 
 import { registerValidation, loginValidation } from './validations/auth.js';
 
@@ -28,7 +30,7 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: (process.env.REACT_APP_URL || 'http://localhost:3000'),
     credentials: true
 }));
 
