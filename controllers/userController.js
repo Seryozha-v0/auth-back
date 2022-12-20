@@ -18,10 +18,11 @@ export const register = async (req, res) => {
             return res.status(400).json(errors.array());
         }
 
-        const email = await UserModel.findOne({ email: req.body.email });
-        if (email) {
-            return res.status(401).json({
-                message: 'email занят!'
+        const emailCheck = await UserModel.findOne({email: req.body.email});
+
+        if (emailCheck) {
+            return res.status(403).json({
+                message: 'Электронная почта уже используется!',
             });
         }
 
