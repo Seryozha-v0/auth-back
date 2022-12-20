@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { keyJW } from '../config.js';
 
 //validation
 import { validationResult } from 'express-validator';
@@ -8,14 +9,14 @@ import { validationResult } from 'express-validator';
 import UserModel from '../models/User.js';
 
 
-export const register =  async (req, res) => {
+
+export const register = async (req, res) => {
     try {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(400).json(errors.array());
         }
-
 
         const emailCheck = await UserModel.findOne({email: req.body.email});
 
@@ -28,6 +29,7 @@ export const register =  async (req, res) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
+        const secKey = keyJW();
 
         const doc = new UserModel({
             email: req.body.email,
@@ -39,13 +41,13 @@ export const register =  async (req, res) => {
 
         const token = jwt.sign({
             _id: user._id,
-        }, 
-        'secretKey47839',
-        {
-            expiresIn: '14d',
-        });
+        },
+            secKey,
+            {
+                expiresIn: '14d',
+            });
 
-        const {passwordHash, ...userData} = user._doc;
+        const { passwordHash, ...userData } = user._doc;
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -65,7 +67,8 @@ export const register =  async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const user = await UserModel.findOne({email: req.body.email});
+        const user = await UserModel.findOne({ email: req.body.email });
+        const secKey = keyJW();
 
         if (!user) {
             return req.status(404).json({
@@ -83,13 +86,13 @@ export const login = async (req, res) => {
 
         const token = jwt.sign({
             _id: user._id,
-        }, 
-        'secretKey47839',
-        {
-            expiresIn: '14d',
-        });
+        },
+            secKey,
+            {
+                expiresIn: '14d',
+            });
 
-        const {passwordHash, ...userData} = user._doc;
+        const { passwordHash, ...userData } = user._doc;
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -117,7 +120,7 @@ export const getMe = async (req, res) => {
             })
         }
 
-        const {passwordHash, ...userData} = user._doc;
+        const { passwordHash, ...userData } = user._doc;
 
         res.json(userData);
     } catch (err) {

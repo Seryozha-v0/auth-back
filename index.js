@@ -4,6 +4,7 @@ import multer from 'multer';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+
 import { registerValidation, loginValidation } from './validations/auth.js';
 
 //utils
@@ -28,12 +29,12 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    // origin: (process.env.REACT_APP_URL || 'http://localhost:3000'),
+    origin: ('https://auth-front-eta.vercel.app'),
     credentials: true
 }));
 
-
-const cookieKey = 'secret123';
+const cookieKey = 'gfryw439829wjdaskdjfhbr321';
 app.use(cookieParser(cookieKey));
 
 app.use('/uploads', express.static('uploads'));
@@ -60,7 +61,7 @@ app.post('/auth/login', loginValidation, handleValidationErrors, userController.
 app.get('/auth/me', checkAuth, userController.getMe);
 app.get('/auth/logout', userController.logOut);
 
-app.listen(4400, (err) => {
+app.listen(process.env.PORT || 4400, (err) => {
     if (err) {
         return console.log(err);
     }
@@ -68,3 +69,4 @@ app.listen(4400, (err) => {
     console.log('Server is OK');
 });
 
+export default app;
