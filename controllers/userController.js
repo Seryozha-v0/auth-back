@@ -16,6 +16,15 @@ export const register =  async (req, res) => {
             return res.status(400).json(errors.array());
         }
 
+
+        const emailCheck = await UserModel.findOne({email: req.body.email});
+
+        if (emailCheck) {
+            return res.status(403).json({
+                message: 'Электронная почта уже используется!',
+            });
+        }
+
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);

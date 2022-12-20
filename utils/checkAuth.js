@@ -16,7 +16,7 @@ export default (req, res, next) => {
             });
         }
     } else {
-        return res.status(405).json({
+        return res.status(403).json({
             message: 'Доступ запрещен',
         })
     }
