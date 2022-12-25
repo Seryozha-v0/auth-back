@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { keyJW } from '../config.js';
 
 export default (req, res, next) => {
-    // const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
     const token = (req.cookies.token || '');
     const secKey = keyJW();
 

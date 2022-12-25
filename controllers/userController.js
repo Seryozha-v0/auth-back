@@ -8,8 +8,6 @@ import { validationResult } from 'express-validator';
 //Models import
 import UserModel from '../models/User.js';
 
-
-
 export const register = async (req, res) => {
     try {
         const errors = validationResult(req);
