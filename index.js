@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import ffmpeg from 'fluent-ffmpeg';
 
 import { registerValidation, loginValidation } from './validations/auth.js';
 import { musicValidation } from './validations/music.js';
@@ -10,7 +11,9 @@ import { musicValidation } from './validations/music.js';
 import { checkAuth, handleValidationErrors } from './utils/index.js';
 import * as userController from './controllers/userController.js';
 import * as musicController from './controllers/musicController.js';
+import * as videoController from './controllers/videoController.js';
 import { keyCookie } from './config.js';
+import { videoValidation } from './validations/video.js';
 
 mongoose
     .connect(
@@ -28,11 +31,11 @@ mongoose
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:3000', 'https://auth-front-eta.vercel.app'];
+const allowedOrigins = ['https://auth-front-eta.vercel.app', 'http://localhost:3000'];
 const corsOptionsDelegate = (req, cb) => {
     const origin = req.header('Origin');
     let corsOptions;
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
         corsOptions = { origin: true, credentials: true }
     } else {
@@ -44,11 +47,12 @@ const corsOptionsDelegate = (req, cb) => {
 const cookieKey = keyCookie();
 app.use(cookieParser(cookieKey));
 
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', cors(corsOptionsDelegate), express.static('uploads'));
 
 const storage = multer.diskStorage({
-    destination: (_, __, cb) => {
-        cb(null, 'uploads');
+    destination: (req, __, cb) => {
+        const subDir = req.originalUrl;
+        cb(null, `uploads${subDir.replace(/\/upload/, '')}`);
     },
     filename: (_, file, cb) => {
         cb(null, file.originalname);
@@ -63,10 +67,10 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     });
 });
 
-app.post('/auth/register', cors(corsOptionsDelegate), registerValidation, handleValidationErrors, userController.register);
-app.post('/auth/login', cors(corsOptionsDelegate), loginValidation, handleValidationErrors, userController.login);
-app.get('/auth/me', cors(corsOptionsDelegate), checkAuth, userController.getMe);
-app.get('/auth/logout', cors(corsOptionsDelegate), userController.logOut);
+app.post('/auth/register', /* cors(corsOptionsDelegate), */ registerValidation, handleValidationErrors, userController.register);
+app.post('/auth/login', /* cors(corsOptionsDelegate), */ loginValidation, handleValidationErrors, userController.login);
+app.get('/auth/me', /* cors(corsOptionsDelegate), */ checkAuth, userController.getMe);
+app.get('/auth/logout', /* cors(corsOptionsDelegate), */ userController.logOut);
 
 
 app.post('/upload/musicImage', checkAuth, upload.single('image'), (req, res) => {
@@ -74,16 +78,37 @@ app.post('/upload/musicImage', checkAuth, upload.single('image'), (req, res) => 
         url: `/uploads/${req.file.originalname}`,
     });
 });
-app.post('/upload/music', checkAuth, upload.single('music'), (req, res) => {
-    res.json({
-        url: `/uploads/${req.file.originalname}`,
+app.post('/upload/musics', checkAuth, upload.single('music'), (req, res) => {
+    const file = `http://localhost:4400/uploads/${req.file.originalname}`;
+
+    ffmpeg.ffprobe(file, (err, meta) => {
+        res.json({
+            url: `/uploads/${req.file.originalname}`,
+            metaData: meta.format,
+        });
     });
 });
-app.get('/musics', cors(corsOptionsDelegate), musicController.getAll);
-app.get('/musics/:id', cors(corsOptionsDelegate), musicController.getOne);
-app.post('/musics', cors(corsOptionsDelegate), checkAuth, musicValidation, musicController.create);
-app.delete('/musics/:id', cors(corsOptionsDelegate), checkAuth, musicController.remove);
-app.patch('/musics/:id', cors(corsOptionsDelegate), checkAuth, musicController.update);
+app.get('/musics', /* cors(corsOptionsDelegate), */ musicController.getAll);
+app.get('/musics/:id', /* cors(corsOptionsDelegate), */ musicController.getOne);
+app.post('/musics', /* cors(corsOptionsDelegate), */ checkAuth, musicValidation, musicController.create);
+app.delete('/musics/:id', /* cors(corsOptionsDelegate), */ checkAuth, musicController.remove);
+app.patch('/musics/:id', /* cors(corsOptionsDelegate), */ checkAuth, musicController.update);
+
+app.post('/upload/videosImage', checkAuth, upload.single('image'), (req, res) => {
+    res.json({
+        url: `${req.originalUrl}/${req.file.originalname}`,
+    });
+});
+app.post('/upload/videos', checkAuth, upload.single('video'), (req, res) => {
+    res.json({
+        url: `uploads${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
+    });
+});
+app.get('/videos', videoController.getAll);
+app.get('/videos/:id', videoController.getOne);
+app.post('/videos', checkAuth, videoValidation, videoController.create);
+app.delete('/videos/:id', checkAuth, videoController.remove);
+app.patch('/videos/:id', checkAuth, videoController.update);
 
 app.listen(process.env.PORT || 4400, (err) => {
     if (err) {

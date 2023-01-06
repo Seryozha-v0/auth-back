@@ -95,6 +95,7 @@ export const create = async (req, res) => {
             autor: req.body.autor,
             imageUrl: req.body.imageUrl,
             musicUrl: req.body.musicUrl,
+            metaData: req.body.metaData,
             user: req.userId,
         });
 
