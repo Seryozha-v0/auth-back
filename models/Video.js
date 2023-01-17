@@ -6,10 +6,16 @@ const VideoSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        author: {
+            type: String,
+        },
         imageUrl: String,
         videoSrc: {
             type: String,
             required: true,
+        },
+        metaData: {
+            type: Object,
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,

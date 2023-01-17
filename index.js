@@ -67,48 +67,58 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     });
 });
 
-app.post('/auth/register', /* cors(corsOptionsDelegate), */ registerValidation, handleValidationErrors, userController.register);
-app.post('/auth/login', /* cors(corsOptionsDelegate), */ loginValidation, handleValidationErrors, userController.login);
-app.get('/auth/me', /* cors(corsOptionsDelegate), */ checkAuth, userController.getMe);
-app.get('/auth/logout', /* cors(corsOptionsDelegate), */ userController.logOut);
+app.post('/auth/register', cors(corsOptionsDelegate), registerValidation, handleValidationErrors, userController.register);
+app.post('/auth/login', cors(corsOptionsDelegate), loginValidation, handleValidationErrors, userController.login);
+app.get('/auth/me', cors(corsOptionsDelegate), checkAuth, userController.getMe);
+app.get('/auth/logout', cors(corsOptionsDelegate), userController.logOut);
 
 
 app.post('/upload/musicImage', checkAuth, upload.single('image'), (req, res) => {
     res.json({
-        url: `/uploads/${req.file.originalname}`,
+        url: `/uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
     });
 });
 app.post('/upload/musics', checkAuth, upload.single('music'), (req, res) => {
-    const file = `http://localhost:4400/uploads/${req.file.originalname}`;
+    const file = `http://localhost:4400/uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`;
 
     ffmpeg.ffprobe(file, (err, meta) => {
         res.json({
-            url: `/uploads/${req.file.originalname}`,
+            url: `/uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
             metaData: meta.format,
         });
     });
 });
-app.get('/musics', /* cors(corsOptionsDelegate), */ musicController.getAll);
-app.get('/musics/:id', /* cors(corsOptionsDelegate), */ musicController.getOne);
-app.post('/musics', /* cors(corsOptionsDelegate), */ checkAuth, musicValidation, musicController.create);
-app.delete('/musics/:id', /* cors(corsOptionsDelegate), */ checkAuth, musicController.remove);
-app.patch('/musics/:id', /* cors(corsOptionsDelegate), */ checkAuth, musicController.update);
+app.get('/musics', cors(corsOptionsDelegate), musicController.getAll);
+app.get('/musics/:id', cors(corsOptionsDelegate), musicController.getOne);
+app.post('/musics', cors(corsOptionsDelegate), checkAuth, musicValidation, musicController.create);
+app.delete('/musics/:id', cors(corsOptionsDelegate), checkAuth, musicController.remove);
+app.patch('/musics/:id', cors(corsOptionsDelegate), checkAuth, musicController.update);
 
-app.post('/upload/videosImage', checkAuth, upload.single('image'), (req, res) => {
-    res.json({
-        url: `${req.originalUrl}/${req.file.originalname}`,
-    });
+app.post('/upload/videosPreview', checkAuth, upload.single('image'), (req, res) => {
+    const file = `http://localhost:4400/uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`;
+
+    ffmpeg.ffprobe(file, (err, meta) => {
+        res.json({
+            url: `uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
+            metaData: meta.format,
+        });
+    })
 });
 app.post('/upload/videos', checkAuth, upload.single('video'), (req, res) => {
-    res.json({
-        url: `uploads${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
-    });
+    const file = `http://localhost:4400/uploads/${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`;
+
+    ffmpeg.ffprobe(file, (err, meta) => {
+        res.json({
+            url: `uploads${req.originalUrl.replace(/\/upload/, '')}/${req.file.originalname}`,
+            metaData: meta.format,
+        });
+    })
 });
-app.get('/videos', videoController.getAll);
-app.get('/videos/:id', videoController.getOne);
-app.post('/videos', checkAuth, videoValidation, videoController.create);
-app.delete('/videos/:id', checkAuth, videoController.remove);
-app.patch('/videos/:id', checkAuth, videoController.update);
+app.get('/videos', cors(corsOptionsDelegate), videoController.getAll);
+app.get('/videos/:id', cors(corsOptionsDelegate), videoController.getOne);
+app.post('/videos', cors(corsOptionsDelegate), checkAuth, videoValidation, videoController.create);
+app.delete('/videos/:id', cors(corsOptionsDelegate), checkAuth, videoController.remove);
+app.patch('/videos/:id', cors(corsOptionsDelegate), checkAuth, videoController.update);
 
 app.listen(process.env.PORT || 4400, (err) => {
     if (err) {

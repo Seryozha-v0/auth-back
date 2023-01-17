@@ -55,8 +55,10 @@ export const create = async (req, res) => {
     try {
         const doc = new VideoModel({
             title: req.body.title,
+            author: req.body.author,
             imageUrl: req.body.imageUrl,
             videoSrc: req.body.videoSrc,
+            metaData: req.body.metaData,
             user: req.userId,
         });
 
