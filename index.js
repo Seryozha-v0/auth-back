@@ -31,7 +31,7 @@ mongoose
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ['https://auth-front-eta.vercel.app', 'http://localhost:3000'];
+const allowedOrigins = ['https://auth-front-eta.vercel.app', 'https://video-player-lac-eight.vercel.app', 'http://localhost:3000'];
 const corsOptionsDelegate = (req, cb) => {
     const origin = req.header('Origin');
     let corsOptions;
